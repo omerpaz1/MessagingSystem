@@ -9,8 +9,8 @@ class Message(models.Model):
     receiver = models.ForeignKey(User,on_delete=models.CASCADE,related_name="receiver")
     message = models.CharField(max_length=100)
     subject = models.CharField(max_length=50)
-    creation_date = models.DateField(auto_now_add=True)
+    creation_date = models.CharField(max_length=50)
  
 
     def __str__(self):
-        return '(Sender: ' + str(self.sender) + ') (Receiver: '  + str(self.receiver) + ') (Message: '  + str(self.message)  + ') (Subject: ' + str(self.subject) + ') (Creation date: ' + str(self.creation_date) +')'
+        return str(self.sender) + ':'  + str(self.receiver) + ':' + str(self.message)  + ':' + str(self.subject) + ':' + str(self.creation_date)
