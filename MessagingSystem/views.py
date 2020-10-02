@@ -1,4 +1,4 @@
-from MessagingSystem.models import Message
+from MessagingSystem.models import Message,UnreadMessages
 from django.contrib.auth.models import User
 from django.http import JsonResponse,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -91,12 +91,38 @@ def get_all_messages(request):
 
 @csrf_exempt
 def get_all_unread_messages(request):
-    pass
+    if request.method == 'POST':
+        # get the user name from the request 
+        user_name = request.POST.get('user_name')
+
+        # get the user id by given the user_name from the User object.
+        try:
+            user_obj = User.objects.filter(username=user_name).first().id
+            # get all the unreaded messages that sent to the requsted user
+            return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj).filter(read=False))),content_type='application/json')
+        except:
+            return HttpResponse({"There is not unreaded messages left" : "empty list"})
+    
 
 @csrf_exempt
 def read_message(request):
-    pass
+    json_response = get_all_unread_messages(request)
+    all_unreaded_msgs = json.loads(json_response.content)
+    try:
+        unreaded_msg_dict = all_unreaded_msgs.pop()
+    except:
+        return HttpResponse({"There is not unreaded messages left" : "empty list"})
+        
+    unreaded_msg = Message.objects.filter(id=unreaded_msg_dict.get('id')).first()
+    unreaded_msg.read = True
+    unreaded_msg.save()
+    return HttpResponse(json.dumps(unreaded_msg_dict),content_type='application/json')
 
 @csrf_exempt
 def delete_message(request):
     pass
+
+
+'''
+  ------------------------------  Helping function ------------------------------ 
+'''
