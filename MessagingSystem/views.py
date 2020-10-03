@@ -47,7 +47,7 @@ def write_message(request):
             msg = Message(sender=sender_user_Obj,receiver=receiver_user_Obj,message=msg,subject=subject,creation_date=str(the_current_date))
             msg.save()
         except:
-            return HttpResponse({"there is a non valid parameter" : "bad parameter"})
+            return HttpResponse({"there is a non valid parameter" : -1})
 
         # convert model object to a json
         return HttpResponse(json.dumps(model_to_dict(msg)), content_type='application/json')
@@ -61,13 +61,15 @@ def get_all_messages(request):
 
     Parameters
     ----------
-    username : str
+    user_name : str
         The name of the sender of the message
 
     Returns
     -------
-    QuerySet
-        a QuerySet that contains all the messages of the specific user
+    HttpResponse
+        contains a json object that contains all the messages of the specific user
+        or a empty dict if doesn't have any messages
+
     """
     if request.method == 'POST':
         # List of messages of the requested user
@@ -84,13 +86,28 @@ def get_all_messages(request):
         try:
             messages_for_specific_user = Message.objects.values().filter(receiver=user_Obj.id)
         except:
-            return HttpResponse({"not a valid name" : "Not Found"})
+            return HttpResponse({"user name doesn't exsits" : -1})
 
         # convert model object to a json
         return HttpResponse(json.dumps(list(messages_for_specific_user)),content_type='application/json')
 
 @csrf_exempt
 def get_all_unread_messages(request):
+    """
+    get all the unreaded messages of a user that requsted.
+
+    Parameters
+    ----------
+    user_name : str
+        The name of the requsted user to get heis unreaded messages
+
+    Returns
+    -------
+    HttpResponse
+        contains a json object that contains all the unreaded messages
+        or a empty dict if doesn't have any messages
+
+    """
     if request.method == 'POST':
         # get the user name from the request 
         user_name = request.POST.get('user_name')
@@ -101,7 +118,7 @@ def get_all_unread_messages(request):
             # get all the unreaded messages that sent to the requsted user
             return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj).filter(read=False))),content_type='application/json')
         except:
-            return HttpResponse({"There is not unreaded messages left" : "empty list"})
+            return JsonResponse({"user name doesn't exsits" : -1})
     
 
 @csrf_exempt
@@ -111,7 +128,7 @@ def read_message(request):
     try:
         unreaded_msg_dict = all_unreaded_msgs.pop()
     except:
-        return HttpResponse({"There is not unreaded messages left" : "empty list"})
+        return HttpResponse({"There is not unreaded messages left" : -1})
         
     unreaded_msg = Message.objects.filter(id=unreaded_msg_dict.get('id')).first()
     unreaded_msg.read = True
@@ -123,6 +140,3 @@ def delete_message(request):
     pass
 
 
-'''
-  ------------------------------  Helping function ------------------------------ 
-'''
