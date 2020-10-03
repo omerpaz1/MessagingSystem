@@ -20,4 +20,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('MessagingSystem.urls')),
 ]
-    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
