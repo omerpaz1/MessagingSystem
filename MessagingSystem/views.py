@@ -1,4 +1,4 @@
-from MessagingSystem.models import Message,UnreadMessages
+from MessagingSystem.models import Message
 from django.contrib.auth.models import User
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseNotFound,HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
