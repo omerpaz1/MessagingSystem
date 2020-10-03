@@ -23,7 +23,7 @@ SECRET_KEY = '5a8h17q4+!$vcl8bljd2yg%71=a#0lj=282a88i#p&ak!s8pnh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ['msg-sys.herokuapp.com']
+ALLOWED_HOSTS = ['msg-sys.herokuapp.com','127.0.0.1']
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'MessagingSystem.apps.MessagingsystemConfig',
     'django.contrib.admin',
     'django.contrib.auth',
+    'rest_framework.authtoken',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',

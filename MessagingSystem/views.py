@@ -74,9 +74,6 @@ def get_all_messages(request,user_id=None):
 
     """
     if request.method == 'GET':
-        # List of messages of the requested user
-        user_messages = []
-
         # get the user name from the request
         user_id = request.GET.get('user_id',None)
 
