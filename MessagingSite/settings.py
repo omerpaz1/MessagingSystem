@@ -25,7 +25,7 @@ SECRET_KEY = '5a8h17q4+!$vcl8bljd2yg%71=a#0lj=282a88i#p&ak!s8pnh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['msg-sys.herokuapp.com']
+ALLOWED_HOSTS = ['msg-sys.herokuapp.com',]
 
 
 # Application definition
@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'MessagingSite.urls'
 
