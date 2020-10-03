@@ -7,8 +7,8 @@ from django.core.validators import validate_comma_separated_integer_list
 
 class Message(models.Model):
     #     sender = models.ForeignKey(User,on_delete=models.CASCADE, related_name="sender")
-    sender = models.ForeignKey(User,on_delete=models.CASCADE, related_name="sender")
-    receiver = models.ForeignKey(User,on_delete=models.CASCADE,related_name="receiver")
+    sender = models.CharField(max_length=50)
+    receiver = models.CharField(max_length=50)
     message = models.CharField(max_length=100)
     subject = models.CharField(max_length=50)
     creation_date = models.CharField(max_length=50)

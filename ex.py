@@ -12,13 +12,20 @@ from datetime import date
 from django.forms.models import model_to_dict
 import re
 
+def foo(msg_id,user_name):
+    msg_obj = Message.objects.filter(id=msg_id).first()
+    if msg_obj == None:
+        print("no exsit")
+        return 0
+    if msg_obj.sender == user_name or msg_obj.receiver == user_name:
+        print("to delete")
+        msg_obj.delete()
+        print(msg_obj)
+        return 0
 
 if __name__ == '__main__':
-    # id_msg = 3
-    # msg = Message.objects.filter(id=id_msg).first()
-    # print(msg)
-    # if msg.sender == "omer" or msg.reciver == "omer":
-    #     print(msg.id)
-    Message.objects.all().delete()
+    foo(41,"nitzan")
 
+    # if msg.sender == "omer" or msg.receiver == "omer":
+    #     print(msg.id)
 
