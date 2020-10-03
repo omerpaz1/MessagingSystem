@@ -15,4 +15,4 @@ import re
 
 if __name__ == '__main__':
 
-    print(Message.objects.all())
+    Message.objects.all().delete()

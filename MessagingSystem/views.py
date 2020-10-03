@@ -2,10 +2,8 @@ from MessagingSystem.models import Message
 from django.contrib.auth.models import User
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseNotFound,HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
 from django.forms.models import model_to_dict
 from datetime import date
-
 import json
 
 @csrf_exempt
@@ -37,27 +35,29 @@ def write_message(request):
         subject = str(request.POST.get('subject'))
 
         # get the sender and the receiver as a User obj
-        
-        sender_user_Obj = User.objects.filter(username=sender).first()
-        receiver_user_Obj = User.objects.filter(username=receiver).first()
-        # check if the sender or the reciver objects does not exists
-        if sender_user_Obj == None or receiver_user_Obj == None:
-            return HttpResponseNotFound("sender or receiver user name does not exsit")
+        try:
+            sender_user_Obj = User.objects.filter(id=sender).first()
+            receiver_user_Obj = User.objects.filter(id=receiver).first()        
+        except:
+            return HttpResponseNotFound("sender and reciver parameters should be a numbers")
+        else:
+            # check if the sender or the reciver objects does not exists
+            if sender_user_Obj == None or receiver_user_Obj == None:
+                return HttpResponseNotFound("sender or receiver user_id does not exist")
 
         #Create a new message and save in db
         the_current_date = date.today()
         try:
-            msg = Message(sender=sender,receiver=receiver,message=msg,subject=subject,creation_date=str(the_current_date))
+            msg = Message(sender=sender_user_Obj,receiver=receiver_user_Obj,message=msg,subject=subject,creation_date=str(the_current_date))
             msg.save()
         except:
             return HttpResponseServerError("there is an error when creating a new message obj")
-
-        # return HttpResponse(json.dumps(model_to_dict(msg)), content_type='application/json')
-        return HttpResponse("The message was created successfully")
+        else:
+            return HttpResponse("The message was created successfully")
 
 
 @csrf_exempt
-def get_all_messages(request):
+def get_all_messages(request,user_id=None):
     """
     Receive all messages for a specific user
 
@@ -73,28 +73,30 @@ def get_all_messages(request):
         or a empty dict if doesn't have any messages
 
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         # List of messages of the requested user
         user_messages = []
 
-        # get the user name from the request 
-        user_name = request.POST.get('user_name')
+        # get the user name from the request
+        user_id = request.GET.get('user_id',None)
 
-        
-        # convert the user name to a user objects.
-        user_Obj = User.objects.filter(username=user_name).first()
+        # get user object from the user_id and check validation
+        try:
+            user_Obj = User.objects.filter(id=user_id).first()
+        except:
+            return HttpResponseNotFound("user_id should be a number")
 
         # get all the messages of the specific user that requsted 
         try:
-            messages_for_specific_user = Message.objects.values().filter(receiver=user_Obj.username)
+            messages_for_specific_user = Message.objects.values().filter(receiver=user_Obj)
         except:
-            return HttpResponseNotFound("user name does not exsit")
-
+            return HttpResponseServerError("server got an error by try get data")
+        
         # convert model object to a json
         return HttpResponse(json.dumps(list(messages_for_specific_user)),content_type='application/json')
 
 @csrf_exempt
-def get_all_unread_messages(request):
+def get_all_unread_messages(request,user_id=None):
     """
     get all the unreaded messages of a user that requsted.
 
@@ -110,17 +112,22 @@ def get_all_unread_messages(request):
         or a empty dict if doesn't have any messages
 
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         # get the user name from the request 
-        user_name = request.POST.get('user_name')
+        user_id = request.GET.get('user_id')
 
+        # get user object from the user_id and check validation
         try:
-             # get the user id by given the user_name from the User object.
-            user_obj = User.objects.filter(username=user_name).first()
-            # get all the unreaded messages that sent to the requsted user
-            return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj.username).filter(read=False))),content_type='application/json')
+            user_obj = User.objects.filter(id=user_id).first()
         except:
-            return HttpResponseNotFound("user name does not exsit")
+            return HttpResponseNotFound("user_id should be a number")
+
+        if user_obj == None:
+            return HttpResponseNotFound("user object does not exist")
+
+        # get all the unreaded messages that sent to the requsted user
+        return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj).filter(read=False))),content_type='application/json')
+
         
 
 @csrf_exempt
@@ -139,19 +146,22 @@ def read_message(request):
         a json object that the message that we pick to read
 
     """
-
-    if request.method == 'POST':
+    if request.method == 'PUT':
         # get the user name from the request 
-        user_name = request.POST.get('user_name')   
+        user_id = request.GET.get('user_id')   
 
-        # get the user id by given the user_name from the User object.
-        user_obj = User.objects.filter(username=user_name).first()
-        if user_obj == None:
-            return HttpResponseNotFound("user name doesn't exsit")
+        # get user object from the user_id and check validation
+        try:
+            user_obj = User.objects.filter(id=user_id).first()
+        except:
+            return HttpResponseNotFound("user_id should be a number")
+        else:
+            if user_obj == None:
+                return HttpResponseNotFound("user object does not exist")
 
         try:
             # pop one message from all the unreaded messages for the user
-            unreaded_msg_obj = list(Message.objects.filter(receiver=user_obj.username).filter(read=False)).pop()
+            unreaded_msg_obj = list(Message.objects.filter(receiver=user_obj).filter(read=False)).pop()
         except:
             return HttpResponseNotFound("There is not unreaded messages left")
         else:
@@ -162,7 +172,7 @@ def read_message(request):
             return HttpResponse(json.dumps(model_to_dict(unreaded_msg_obj)),content_type='application/json')
 
 @csrf_exempt
-def delete_message(request):
+def delete_message(request,user_id=None,msg_id=None):
 
     """
     delete a message of a requested user
@@ -178,18 +188,28 @@ def delete_message(request):
 
     """
 
-    if request.method == 'POST':
-        # get the user name and the message id from the request 
-        user_name = request.POST.get('user_name')  
-        msg_id =  request.POST.get('msg_id')  
+    if request.method == 'DELETE':
 
-        msg_obj = Message.objects.filter(id=msg_id).first()
-        # check if the requested message exsit
+        # get the user name and the message id from the request 
+        user_id = request.GET.get('user_id')  
+        msg_id =  request.GET.get('msg_id')  
+
+        # check validation of the user_id and the msg_id
+        try:
+            user_obj = User.objects.filter(id=user_id).first()        
+            msg_obj = Message.objects.filter(id=msg_id).first()
+        except:
+            return HttpResponseNotFound("user_id and msg_id should be a numbers")
+
+        # check if msg_obj and user_obj exists
         if msg_obj == None:
-            return HttpResponseNotFound("message object does not exsit")
+            return HttpResponseNotFound("message object does not exist")
+
+        if user_obj == None:
+            return HttpResponseNotFound("user object does not exist")
 
         # if the sender or the receiver equal to the user name in the request, we delete the message.
-        if msg_obj.sender == user_name or msg_obj.receiver == user_name:
+        if msg_obj.sender == user_obj or msg_obj.receiver == user_obj:
             try:
                 msg_obj.delete()
             except:
