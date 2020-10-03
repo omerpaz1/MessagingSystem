@@ -151,7 +151,7 @@ def read_message(request):
 
         try:
             # pop one message from all the unreaded messages for the user
-            unreaded_msg_obj = list(Message.objects.filter(receiver="nitzan").filter(read=False)).pop()
+            unreaded_msg_obj = list(Message.objects.filter(receiver=user_obj.username).filter(read=False)).pop()
         except:
             return HttpResponseNotFound("There is not unreaded messages left")
         else:
