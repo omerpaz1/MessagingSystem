@@ -11,11 +11,10 @@ from django.core import serializers
 from datetime import date
 from django.forms.models import model_to_dict
 import re
-from rest_framework.authtoken.models import Token
 
 
 
 if __name__ == '__main__':
 
-    token = Token.objects.create(user=User.objects.filter(id=1).first())
-    print(token.key)
+    sender_user_Obj = User.objects.filter(id="3").first()
+    print(sender_user_Obj)
