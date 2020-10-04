@@ -25,7 +25,7 @@ using Token for authentications users
 ### Request
 for admin authenticated user, for example: id = 2
 
-`GET /api/get-all-messages?user_id=id`
+`GET /api/get-all-messages?user_id=2`
 
 ### Response
 
@@ -128,7 +128,7 @@ HTTP/1.1 200 OK
  ```
  
  ### Request
-for authenticated user, for example: id = 3
+for authenticated user, for example: id = 2
 
 `GET /api/get-all-unread-messages`
 
