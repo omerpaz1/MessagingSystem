@@ -21,13 +21,13 @@ link to the site:
 
 ## Get all messages for a specific user
 
-### Request(as superuser)
+### Request(for admin user)
 
 `GET /api/get-all-messages?user_id=id`
 
 ### Response
 
-HTTP/1.1 200 OK
+``` HTTP/1.1 200 OK
 Connection: keep-alive
 Server: gunicorn/19.9.0
 Date: Sun, 04 Oct 2020 13:18:58 GMT
@@ -36,11 +36,11 @@ Vary: Accept
 Allow: OPTIONS, GET
 X-Frame-Options: SAMEORIGIN
 Content-Length: 366
-Via: 1.1 vegur
-
-### Body
+Via: 1.1 vegur 
 ```
-{
+### Body
+
+```{
         "id": 10,
         "sender_id": 3,
         "receiver_id": 2,
@@ -50,4 +50,35 @@ Via: 1.1 vegur
         "read": false,
         "visible": true
  }
+ ```
+
+### Request(for authenticated user)
+
+`GET /api/get-all-messages?user_id=id`
+
+### Response
+
+``` HTTP/1.1 200 OK
+Connection: keep-alive
+Server: gunicorn/19.9.0
+Date: Sun, 04 Oct 2020 13:18:58 GMT
+Content-Type: application/json
+Vary: Accept
+Allow: OPTIONS, GET
+X-Frame-Options: SAMEORIGIN
+Content-Length: 366
+Via: 1.1 vegur 
 ```
+### Body
+
+```{
+        "id": 10,
+        "sender_id": 3,
+        "receiver_id": 2,
+        "message": "hello user 2 :) , nice to meet you!",
+        "subject": "hey user 2",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+ }```
+
