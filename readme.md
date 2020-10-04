@@ -184,6 +184,54 @@ HTTP/1.1 200 OK
 ]
 
  ```
+ 
+## Read message
+using parameters without authentication
 
+### Request
+for example: id = 2
+
+`PUT /api/read-message?user_id=2`
+
+### Response
+
+``` 
+HTTP/1.1 200 OK
+```
+ 
+### Body
+The field 'read' become 'true' , then it will not apper in the unreaded messages anymore.
+
+```
+{
+    "id": 11,
+    "sender": 4,
+    "receiver": 2,
+    "message": "hello user 2 :) , nice to meet you!",
+    "subject": "hey user 2",
+    "creation_date": "2020-10-04",
+    "read": true,
+    "visible": true
+}
+
+```
+
+## Delete message
+using Token for authentication users
+
+### Request
+for admin authenticated user, for example: id = 2 , msg id = 11 (the message from the 'read message' example)
+
+`DELETE /api/delete-message?user_id=2&msg_id=11`
+
+### Response
+
+```
+HTTP/1.1 200 OK
+```
+### Body
+```
+The message was deleted successfully
+```
 
 
