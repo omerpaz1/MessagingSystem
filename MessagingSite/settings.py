@@ -26,8 +26,8 @@ DEBUG = False
 ALLOWED_HOSTS = ['msg-sys.herokuapp.com','127.0.0.1']
 
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
 
 
 
