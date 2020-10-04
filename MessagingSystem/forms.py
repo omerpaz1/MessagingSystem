@@ -13,7 +13,6 @@ class UserID(forms.Form):
     # this form is form check if the user_id that send is type of int
     user_id = forms.IntegerField()
 
-class DeleteMessage(forms.Form):
-    # this form is form check if the user_id and msg_id that send is type of int
-    user_id = forms.IntegerField()
+class MessageID(forms.Form):
+    # this form is form check if the msg_id that send is type of int
     msg_id = forms.IntegerField()

@@ -8,7 +8,7 @@ from datetime import date
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from MessagingSystem.forms import MessageForm,UserID,DeleteMessage
+from MessagingSystem.forms import UserID,MessageID,MessageForm
 
 DateToJson = lambda obj: (
     obj.isoformat()
@@ -81,18 +81,11 @@ def get_all_messages(request):
     # check if the request user is a superuser
     if request.user.is_superuser:
 
-        form = UserID(request.GET)
-
-        if form.is_valid():
-            user_id = request.GET.get('user_id')   
-        else:
-            return HttpResponseNotFound("not valid form")
-
-        # get user object from the user_id
-        user_obj = User.objects.filter(id=user_id).first()
-
+        # get the user object
+        user_obj = getUserObj(request)
         if not user_obj:
             return HttpResponseNotFound("user object does not exist")
+
     # the user is authenticated then get the user from the request.
     else:
         user_obj = request.user
@@ -124,17 +117,11 @@ def get_all_unread_messages(request):
     # check if the request user is a superuser
     if request.user.is_superuser:
 
-        form = UserID(request.GET)
-        if form.is_valid():
-            user_id = request.GET.get('user_id')   
-        else:
-            return HttpResponseNotFound("not valid form")
-
-        # get user object from the user_id
-        user_obj = User.objects.filter(id=user_id).first()
-
+        # get the user object
+        user_obj = getUserObj(request)
         if not user_obj:
             return HttpResponseNotFound("user object does not exist")
+
     # the user is authenticated then get the user from the request.
     else:
         user_obj = request.user
@@ -160,25 +147,18 @@ def read_message(request):
         Response -- The appropriate HttpResponse object.
 
     """
-    # get the user id from the request 
-    form = UserID(request.GET)
-    if form.is_valid():
-        user_id = request.GET.get('user_id')   
-    else:
-        return HttpResponseNotFound("not valid form")
-
-    # get user object from the user_id
-    user_Obj = User.objects.filter(id=user_id).first()
-        
-    if not user_Obj:
+    # get the user object
+    user_obj = getUserObj(request)
+    if not user_obj:
         return HttpResponseNotFound("user object does not exist")
 
-    unreaded_msg_obj = Message.objects.filter(receiver=user_Obj,read=False).last()
+    unreaded_msg_obj = Message.objects.filter(receiver=user_obj,read=False).last()
 
     if not unreaded_msg_obj:
         # make the message as Ture and return it
         return HttpResponse("there is not unreaded messages for you")
 
+    # read the message, mark as true
     else:
         unreaded_msg_obj.read = True
         unreaded_msg_obj.save()    
@@ -201,20 +181,12 @@ def delete_message(request,user_id=None,msg_id=None):
         Response -- The appropriate HttpResponse object.
 
     """
+
     # get the user id and the message id from the request 
-    form = DeleteMessage(request.GET)
-    if form.is_valid():
-        user_id = request.GET.get('user_id')  
-        msg_id =  request.GET.get('msg_id')  
-    else:
-        return HttpResponseNotFound("not valid form")
+    user_obj = getUserObj(request)
+    msg_obj = getMsgObj(request)
 
-
-    user_obj = User.objects.filter(id=user_id).first()        
-    msg_obj = Message.objects.filter(id=msg_id,visible=True).first()
-
-    # check if msg_obj and user_obj exists
-    if not msg_obj or not user_obj:
+    if not user_obj or not msg_obj:
         return HttpResponseNotFound("message or user object does not exist")
 
         # if the sender or the receiver equal to the user name in the request, we delete the message.
@@ -227,3 +199,28 @@ def delete_message(request,user_id=None,msg_id=None):
         return HttpResponseNotFound("user id is not equal to the sender or the reciver")
 
     
+
+def getUserObj(request):
+    '''
+    this function will get the user from the request
+
+    '''
+    form = UserID(request.GET)
+    if form.is_valid():
+        return User.objects.filter(id=request.GET.get('user_id')).first()  
+    return None
+
+
+def getMsgObj(request):
+    '''
+    this function will get the user and the message from the request
+
+    '''
+    form = MessageID(request.GET)
+    if form.is_valid():
+        return Message.objects.filter(id=request.GET.get('msg_id'),visible=True).first()
+    return None
+
+
+
+
