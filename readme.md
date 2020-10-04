@@ -75,22 +75,115 @@ HTTP/1.1 200 OK
 ]
  ```
  
- ## Get all messages for a specific user
+ ## Get all unread messages for a specific user
 using Token for authentications users
 
 ### Request
-for admin authenticated user, for example: id = 2
+for admin authenticated user, for example: id = 4
 
-`GET /api/`
+`GET /api/get-all-unread-messages?user_id=4`
 
 ### Response
 
-``` 
+```
+HTTP/1.1 200 OK
+
 ```
 ### Body
 
 ```
+[
+    {
+        "id": 5,
+        "sender_id": 3,
+        "receiver_id": 4,
+        "message": "hello user 4 :) , nice to meet you!",
+        "subject": "hey user 4",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    },
+    {
+        "id": 9,
+        "sender_id": 2,
+        "receiver_id": 4,
+        "message": "hello user 4 :) , nice to meet you!",
+        "subject": "hey user 4",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    },
+    {
+        "id": 12,
+        "sender_id": 3,
+        "receiver_id": 4,
+        "message": "hello user 4 :) , nice to meet you!",
+        "subject": "hey user 4",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    }
+]
 
  ```
+ 
+ ### Request
+for authenticated user, for example: id = 3
+
+`GET /api/get-all-unread-messages`
+
+### Response
+
+``` 
+HTTP/1.1 200 OK
+```
+### Body
+
+```
+[
+    {
+        "id": 6,
+        "sender_id": 4,
+        "receiver_id": 2,
+        "message": "hello user 2 :) , nice to meet you!",
+        "subject": "hey user 2",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    },
+    {
+        "id": 8,
+        "sender_id": 3,
+        "receiver_id": 2,
+        "message": "hello user 2 :) , nice to meet you!",
+        "subject": "hey user 2",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    },
+    {
+        "id": 10,
+        "sender_id": 3,
+        "receiver_id": 2,
+        "message": "hello user 2 :) , nice to meet you!",
+        "subject": "hey user 2",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    },
+    {
+        "id": 11,
+        "sender_id": 4,
+        "receiver_id": 2,
+        "message": "hello user 2 :) , nice to meet you!",
+        "subject": "hey user 2",
+        "creation_date": "2020-10-04",
+        "read": false,
+        "visible": true
+    }
+]
+
+ ```
+
 
 
