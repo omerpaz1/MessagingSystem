@@ -48,6 +48,30 @@ HTTP/1.1 200 OK
         }
 ]
  ```
+ ## New message
+
+### Request
+
+`POST /api/new-message`
+
+#### Request Body
+```
+sender: "2"
+receiver: "4"
+msg: "hello user 4 :) , nice to meet you!"
+subject: "hey user 4"
+ ```
+
+### Response
+
+``` 
+HTTP/1.1 200 OK
+```
+### Body
+
+```
+The message was created successfully
+ ```
 
 ### Request
 for authenticated user, for example: id = 3
