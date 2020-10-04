@@ -23,13 +23,14 @@ link to the site:
 using Token for authentications users
 
 ### Request
-for admin authenticated user
+for admin authenticated user, for example: id = 2
 
 `GET /api/get-all-messages?user_id=id`
 
 ### Response
 
-``` HTTP/1.1 200 OK
+``` 
+HTTP/1.1 200 OK
 ```
 ### Body
 
@@ -49,7 +50,7 @@ for admin authenticated user
  ```
 
 ### Request
-for authenticated user
+for authenticated user, for example: id = 3
 
 `GET /api/get-all-messages`
 
@@ -59,17 +60,17 @@ for authenticated user
 ```
 ### Body
 ```
-]
-        {
-        "id": 10,
-        "sender_id": 3,
-        "receiver_id": 2,
-        "message": "hello user 2 :) , nice to meet you!",
-        "subject": "hey user 2",
+[
+    {
+        "id": 7,
+        "sender_id": 4,
+        "receiver_id": 3,
+        "message": "hello user 3 :) , nice to meet you!",
+        "subject": "hey user 3",
         "creation_date": "2020-10-04",
-        "read": false,
+        "read": true,
         "visible": true
-        }
+    }
 ]
  ```
 
