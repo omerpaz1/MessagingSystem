@@ -17,11 +17,4 @@ def foo():
     return HttpResponseServerError("server got an error by try get data")
 
 if __name__ == '__main__':
-    user_obj = User.objects.filter(id=3).first()
-    messages_for_specific_user = Message.objects.values().filter(receiver=user_obj,visible=True)
-    enco = lambda obj: (
-    obj.isoformat()
-    if isinstance(obj, date)
-    else None
-    )
-    print(json.dumps(list(messages_for_specific_user),default=enco))
+    print(Message.objects.filter(id=14).first())

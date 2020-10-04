@@ -16,5 +16,5 @@ class Message(models.Model):
  
 
     def __str__(self):
-        return str(self.sender) + ':'  + str(self.receiver) + ':' + str(self.message)  + ':' + str(self.subject) + ':' + str(self.creation_date) + ':' + str(self.read)
+        return "Sender: "+str(self.sender) + ', Receiver: ' + str(self.receiver) + ', Message: ' + str(self.message)  + ', Subject: ' + str(self.subject) + ', Creation date: ' + str(self.creation_date) + ', Read: ' + str(self.read) + ', Visible: ' + str(self.visible)
 
