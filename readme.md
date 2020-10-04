@@ -56,7 +56,8 @@ for authenticated user, for example: id = 3
 
 ### Response
 
-``` HTTP/1.1 200 OK
+``` 
+HTTP/1.1 200 OK
 ```
 ### Body
 ```
@@ -73,4 +74,23 @@ for authenticated user, for example: id = 3
     }
 ]
  ```
+ 
+ ## Get all messages for a specific user
+using Token for authentications users
+
+### Request
+for admin authenticated user, for example: id = 2
+
+`GET /api/`
+
+### Response
+
+``` 
+```
+### Body
+
+```
+
+ ```
+
 
