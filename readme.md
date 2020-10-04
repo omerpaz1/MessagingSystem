@@ -20,27 +20,22 @@ link to the site:
 > http://msg-sys.herokuapp.com/api
 
 ## Get all messages for a specific user
+using Token for authentications users
 
-### Request(for admin user)
+### Request
+for admin authenticated user
 
 `GET /api/get-all-messages?user_id=id`
 
 ### Response
 
 ``` HTTP/1.1 200 OK
-Connection: keep-alive
-Server: gunicorn/19.9.0
-Date: Sun, 04 Oct 2020 13:18:58 GMT
-Content-Type: application/json
-Vary: Accept
-Allow: OPTIONS, GET
-X-Frame-Options: SAMEORIGIN
-Content-Length: 366
-Via: 1.1 vegur 
 ```
 ### Body
 
-```{
+```
+]
+        {
         "id": 10,
         "sender_id": 3,
         "receiver_id": 2,
@@ -49,29 +44,23 @@ Via: 1.1 vegur
         "creation_date": "2020-10-04",
         "read": false,
         "visible": true
- }
+        }
+]
  ```
 
-### Request(for authenticated user)
+### Request
+for authenticated user
 
-`GET /api/get-all-messages?user_id=id`
+`GET /api/get-all-messages`
 
 ### Response
 
 ``` HTTP/1.1 200 OK
-Connection: keep-alive
-Server: gunicorn/19.9.0
-Date: Sun, 04 Oct 2020 13:18:58 GMT
-Content-Type: application/json
-Vary: Accept
-Allow: OPTIONS, GET
-X-Frame-Options: SAMEORIGIN
-Content-Length: 366
-Via: 1.1 vegur 
 ```
 ### Body
-
-```{
+```
+]
+        {
         "id": 10,
         "sender_id": 3,
         "receiver_id": 2,
@@ -80,5 +69,7 @@ Via: 1.1 vegur
         "creation_date": "2020-10-04",
         "read": false,
         "visible": true
- }```
+        }
+]
+ ```
 
