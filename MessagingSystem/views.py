@@ -22,23 +22,18 @@ import json
 @csrf_exempt
 def write_message(request):
     """
-    write a new message by user to other user
+    Write a new message by user to other user.
+    We assume that request variables are:
+        sender {int} -- the sender id.
+        receiver {int} -- the receiver id.
+        message {str} -- the message the sender wants to send to the receiver, message limit is 100 chars.
+        subject {str} -- the subject of message, subject limit is 50 chars.
 
-    Arguments
-    ----------
-    request - we are expecting the following parameters:
-        sender : str
-            the user that will be the "sender" of the message (need to be integer)
-        receiver : str
-            the user that will be the "receiver" of the message (need to be integer)
-        message : str
-            content of the message
-        subject : str
-            The subject of the message 
+    Arguments:
+        request {Request} -- Request object.
 
-    Returns
-    -------
-    HttpResponse
+    Returns:
+        Response -- The appropriate HttpResponse object.
     """
 
     # get request info from the body.
@@ -73,17 +68,15 @@ def get_all_messages(request):
     """
     Receive all messages for a specific user
 
-    Arguments
-    ----------
-    request - we are expecting the following parameters:
-        user_id : str
-            the user that we want to receive heis all messages 
-    Returns
-    -------
-    HttpResponse
-        a json object that contains all the messages of the specific user
-        or a empty dict if doesn't have any messages
+    We assume that request variable is:
+        user_id {int} -- the requested user id
 
+
+    Arguments:
+        request {Request} -- Request object.
+
+    Returns:
+        Response -- The appropriate HttpResponse object.
     """
     # check if the request user is a superuser
     if request.user.is_superuser:
@@ -107,7 +100,7 @@ def get_all_messages(request):
     # get all the messages of the specific user that requsted 
     messages_for_specific_user = Message.objects.values().filter(receiver=user_obj,visible=True)
 
-    # convert model object to a json
+    # convert model object to a json and return respones
     return HttpResponse(json.dumps(list(messages_for_specific_user),default=DateToJson),content_type='application/json')
 
 @api_view(['GET'])
@@ -116,19 +109,16 @@ def get_all_messages(request):
 @permission_classes([IsAuthenticated])
 def get_all_unread_messages(request):
     """
-    get all the unreaded messages of a user that requsted.
+    get all the unreaded messages of a user.
 
-    Parameters
-    ----------
-    request - we are expecting the following parameters:
-        user_id : str
-            the user that we will get heis unreaded messages
+    We assume that request variable is:
+        user_id {int} -- the requested user id
 
-    Returns
-    -------
-    HttpResponse
-        a json object that contains all the unreaded messages
-        or a empty dict if doesn't have any messages
+    Arguments:
+        request {Request} -- Request object.
+
+    Returns:
+        Response -- The appropriate HttpResponse object.
 
     """
     # check if the request user is a superuser
@@ -159,16 +149,15 @@ def read_message(request):
     """
     read the last message that sent to a requsted user
 
-    Parameters
-    ----------
-    request - we are expecting the following parameters:
-        user_id : str
-            the user that we will get heis last message and read it
 
-    Returns
-    -------
-    HttpResponse
-        a json object that the message that we pick to read
+    We assume that request variable is:
+        user_id {int} -- the requested user id
+
+    Arguments:
+        request {Request} -- Request object.
+
+    Returns:
+        Response -- The appropriate HttpResponse object.
 
     """
     # get the user id from the request 
@@ -202,19 +191,17 @@ def delete_message(request,user_id=None,msg_id=None):
 
     """
     delete a message of a requested user
+    We assume that request variable is:
+        user_id {int} -- the requested user id
 
-    Parameters
-    ----------
-    request - we are expecting the following parameters:
-        user_id : str
-            the user that we want to delete message from heis messages
+    Arguments:
+        request {Request} -- Request object.
 
-    Returns
-    -------
-    HttpResponse
+    Returns:
+        Response -- The appropriate HttpResponse object.
 
     """
-    # get the user name and the message id from the request 
+    # get the user id and the message id from the request 
     form = DeleteMessage(request.GET)
     if form.is_valid():
         user_id = request.GET.get('user_id')  
@@ -223,7 +210,6 @@ def delete_message(request,user_id=None,msg_id=None):
         return HttpResponseNotFound("not valid form")
 
 
-    # check validation of the user_id and the msg_id and get the objects
     user_obj = User.objects.filter(id=user_id).first()        
     msg_obj = Message.objects.filter(id=msg_id,visible=True).first()
 
@@ -237,4 +223,7 @@ def delete_message(request,user_id=None,msg_id=None):
         msg_obj.save()
 
         return HttpResponse("The message was deleted successfully")
+    else:
+        return HttpResponseNotFound("user id is not equal to the sender or the reciver")
+
     
