@@ -27,7 +27,7 @@ link to the site:
 
 ### Response
 
-`HTTP/1.1 200 OK
+HTTP/1.1 200 OK
 Connection: keep-alive
 Server: gunicorn/19.9.0
 Date: Sun, 04 Oct 2020 13:18:58 GMT
@@ -36,10 +36,11 @@ Vary: Accept
 Allow: OPTIONS, GET
 X-Frame-Options: SAMEORIGIN
 Content-Length: 366
-Via: 1.1 vegur`
+Via: 1.1 vegur
 
 ### Body
-`{
+```
+{
         "id": 10,
         "sender_id": 3,
         "receiver_id": 2,
@@ -48,7 +49,5 @@ Via: 1.1 vegur`
         "creation_date": "2020-10-04",
         "read": false,
         "visible": true
- }`
-
-
-    []
+ }
+```
