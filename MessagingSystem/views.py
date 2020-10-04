@@ -68,9 +68,12 @@ def get_all_messages(request):
     """
     Receive all messages for a specific user
 
+    This method is required authentication.
+    request by type 'superuser' is the admin user 
+    that only he can asked for diffrent users messages.
+
     We assume that request variable is:
         user_id {int} -- the requested user id
-
 
     Arguments:
         request {Request} -- Request object.
@@ -103,6 +106,10 @@ def get_all_messages(request):
 def get_all_unread_messages(request):
     """
     get all the unreaded messages of a user.
+    
+    This method is required authentication.
+    request by type 'superuser' is the admin user 
+    that only he can asked for diffrent users messages.
 
     We assume that request variable is:
         user_id {int} -- the requested user id
