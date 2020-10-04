@@ -3,10 +3,13 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse,HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes,authentication_classes
 from datetime import date
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from MessagingSystem.forms import MessageForm,UserID,DeleteMessage
+
 import json
 
 @api_view(['POST'])
@@ -33,17 +36,19 @@ def write_message(request):
     """
 
     # get request info from the body.
-    sender = request.POST.get('sender')
-    receiver = request.POST.get('receiver')
-    msg = request.POST.get('msg')
-    subject = request.POST.get('subject')
+    form = MessageForm(request.POST)
+    if form.is_valid():
+        sender = request.POST.get('sender')
+        receiver = request.POST.get('receiver')
+        msg = request.POST.get('msg')
+        subject = request.POST.get('subject')
+    else:
+        return HttpResponseNotFound("not valid form")
+  
 
     # get the sender and the receiver as a User obj
-    if RepresentsInt(sender) and RepresentsInt(receiver):
-        sender_user_Obj = User.objects.filter(id=sender).first()
-        receiver_user_Obj = User.objects.filter(id=receiver).first() 
-    else:
-        return HttpResponse("sender and reciver parameters should be a integer numbers",status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    sender_user_Obj = User.objects.filter(id=sender).first()
+    receiver_user_Obj = User.objects.filter(id=receiver).first() 
 
     # check if the sender or the reciver objects does not exists
     if not sender_user_Obj or not receiver_user_Obj:
@@ -57,6 +62,8 @@ def write_message(request):
 
 @api_view(['GET'])
 @csrf_exempt
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_all_messages(request):
     """
     Receive all messages for a specific user
@@ -73,27 +80,35 @@ def get_all_messages(request):
         or a empty dict if doesn't have any messages
 
     """
-    authentication_classes = (TokenAuthentication,)
-    # get the user name from the request
-    user_id = request.GET.get('user_id',None)
+    # check if the request user is a superuser
+    if request.user.is_superuser:
 
-    # get user object from the user_id and check validation
-    if RepresentsInt(user_id):
-        user_Obj = User.objects.filter(id=user_id).first()
+        form = UserID(request.GET)
+
+        if form.is_valid():
+            user_id = request.GET.get('user_id')   
+        else:
+            return HttpResponseNotFound("not valid form")
+
+        # get user object from the user_id
+        user_obj = User.objects.filter(id=user_id).first()
+
+        if not user_obj:
+            return HttpResponseNotFound("user object does not exist")
+    # the user is authenticated then get the user from the request.
     else:
-        return HttpResponse("user_id should be a integer number",status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        
-    if not user_Obj:
-        return HttpResponseNotFound("user object does not exist")
+        user_obj = request.user
 
     # get all the messages of the specific user that requsted 
-    messages_for_specific_user = Message.objects.values().filter(receiver=user_Obj,visible=True)
+    messages_for_specific_user = Message.objects.values().filter(receiver=user_obj,visible=True)
 
     # convert model object to a json
     return HttpResponse(json.dumps(list(messages_for_specific_user)),content_type='application/json')
 
 @api_view(['GET'])
 @csrf_exempt
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_all_unread_messages(request):
     """
     get all the unreaded messages of a user that requsted.
@@ -111,17 +126,23 @@ def get_all_unread_messages(request):
         or a empty dict if doesn't have any messages
 
     """
-    # get the user name from the request 
-    user_id = request.GET.get('user_id')
+    # check if the request user is a superuser
+    if request.user.is_superuser:
 
-    # get user object from the user_id and check validation
-    if RepresentsInt(user_id):
+        form = UserID(request.GET)
+        if form.is_valid():
+            user_id = request.GET.get('user_id')   
+        else:
+            return HttpResponseNotFound("not valid form")
+
+        # get user object from the user_id
         user_obj = User.objects.filter(id=user_id).first()
-    else:
-        return HttpResponse("user_id should be a integer number",status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    if not user_obj:
-        return HttpResponseNotFound("user object does not exist")
+        if not user_obj:
+            return HttpResponseNotFound("user object does not exist")
+    # the user is authenticated then get the user from the request.
+    else:
+        user_obj = request.user
 
     # get all the unreaded messages that sent to the requsted user
     return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj,read=False,visible=True))),content_type='application/json')
@@ -145,14 +166,15 @@ def read_message(request):
         a json object that the message that we pick to read
 
     """
-    # get the user name from the request 
-    user_id = request.GET.get('user_id')   
-
-    # get user object from the user_id and check validation
-    if RepresentsInt(user_id):
-        user_Obj = User.objects.filter(id=user_id).first()
+    # get the user id from the request 
+    form = UserID(request.GET)
+    if form.is_valid():
+        user_id = request.GET.get('user_id')   
     else:
-        return HttpResponse("user_id should be a integer number",status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return HttpResponseNotFound("not valid form")
+
+    # get user object from the user_id
+    user_Obj = User.objects.filter(id=user_id).first()
         
     if not user_Obj:
         return HttpResponseNotFound("user object does not exist")
@@ -188,16 +210,17 @@ def delete_message(request,user_id=None,msg_id=None):
 
     """
     # get the user name and the message id from the request 
-    user_id = request.GET.get('user_id')  
-    msg_id =  request.GET.get('msg_id')  
+    form = DeleteMessage(request.GET)
+    if form.is_valid():
+        user_id = request.GET.get('user_id')  
+        msg_id =  request.GET.get('msg_id')  
+    else:
+        return HttpResponseNotFound("not valid form")
+
 
     # check validation of the user_id and the msg_id and get the objects
-    if RepresentsInt(user_id) and RepresentsInt(msg_id):
-
-        user_obj = User.objects.filter(id=user_id).first()        
-        msg_obj = Message.objects.filter(id=msg_id,visible=True).first()
-    else:
-        return HttpResponse("user_id and msg_obj should be a integer numbers",status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    user_obj = User.objects.filter(id=user_id).first()        
+    msg_obj = Message.objects.filter(id=msg_id,visible=True).first()
 
     # check if msg_obj and user_obj exists
     if not msg_obj or not user_obj:
