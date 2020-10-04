@@ -18,3 +18,4 @@ class Message(models.Model):
     def __str__(self):
         return "Sender: "+str(self.sender) + ', Receiver: ' + str(self.receiver) + ', Message: ' + str(self.message)  + ', Subject: ' + str(self.subject) + ', Creation date: ' + str(self.creation_date) + ', Read: ' + str(self.read) + ', Visible: ' + str(self.visible)
 
+
