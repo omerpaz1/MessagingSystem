@@ -10,7 +10,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User,on_delete=models.CASCADE, related_name="receiver")
     message = models.CharField(max_length=100)
     subject = models.CharField(max_length=50)
-    creation_date = models.CharField(max_length=50)
+    creation_date = models.DateField()
     read = models.BooleanField(blank=False,default=False)
     visible = models.BooleanField(blank=False,default=True)
  

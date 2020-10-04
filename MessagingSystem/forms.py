@@ -2,6 +2,7 @@ from django import forms
 
 
 class MessageForm(forms.Form):
+    # this from represent a new message
     sender = forms.IntegerField()
     receiver = forms.IntegerField()
     msg = forms.CharField(max_length=100)

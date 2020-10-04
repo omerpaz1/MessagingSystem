@@ -10,6 +10,12 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from MessagingSystem.forms import MessageForm,UserID,DeleteMessage
 
+DateToJson = lambda obj: (
+    obj.isoformat()
+    if isinstance(obj, date)
+    else None
+)
+
 import json
 
 @api_view(['POST'])
@@ -54,9 +60,8 @@ def write_message(request):
     if not sender_user_Obj or not receiver_user_Obj:
         return HttpResponseNotFound("sender or receiver does not exist")
 
-    #Create a new message and save in db
-    the_current_date = date.today()
-    Message.objects.create(sender=sender_user_Obj,receiver=receiver_user_Obj,message=msg,subject=subject,creation_date=the_current_date)
+    # Create a new message and save in db
+    Message.objects.create(sender=sender_user_Obj,receiver=receiver_user_Obj,message=msg,subject=subject,creation_date=date.today())
 
     return HttpResponse("The message was created successfully")
 
@@ -103,7 +108,7 @@ def get_all_messages(request):
     messages_for_specific_user = Message.objects.values().filter(receiver=user_obj,visible=True)
 
     # convert model object to a json
-    return HttpResponse(json.dumps(list(messages_for_specific_user)),content_type='application/json')
+    return HttpResponse(json.dumps(list(messages_for_specific_user),default=DateToJson),content_type='application/json')
 
 @api_view(['GET'])
 @csrf_exempt
@@ -145,7 +150,7 @@ def get_all_unread_messages(request):
         user_obj = request.user
 
     # get all the unreaded messages that sent to the requsted user
-    return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj,read=False,visible=True))),content_type='application/json')
+    return HttpResponse(json.dumps(list(Message.objects.values().filter(receiver=user_obj,read=False,visible=True)),default=DateToJson),content_type='application/json')
 
         
 @api_view(['PUT'])
@@ -189,7 +194,7 @@ def read_message(request):
         unreaded_msg_obj.read = True
         unreaded_msg_obj.save()    
 
-    return HttpResponse(json.dumps(model_to_dict(unreaded_msg_obj)),content_type='application/json')
+    return HttpResponse(json.dumps(model_to_dict(unreaded_msg_obj),default=DateToJson),content_type='application/json')
 
 @api_view(['DELETE'])
 @csrf_exempt
@@ -233,24 +238,3 @@ def delete_message(request,user_id=None,msg_id=None):
 
         return HttpResponse("The message was deleted successfully")
     
-
-
-def RepresentsInt(s):
-    
-    """
-    get if the "s" is a integer value.
-
-    Parameters
-    ----------
-    s - str object the we will get from the request
-
-    Returns
-    -------
-    Boolean 
-
-    """
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
