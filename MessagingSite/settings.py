@@ -34,10 +34,10 @@ STATIC_URL = '/static/'
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework.authtoken',
     'MessagingSystem.apps.MessagingsystemConfig',
     'django.contrib.admin',
     'django.contrib.auth',
-    'rest_framework.authtoken',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
